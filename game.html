@@ -36,11 +36,14 @@
                         <a data-sjslink="all" class="nav__link">
                             全部
                         </a>
+						<a :data-sjslink="it" class="nav__link" v-for="it in types">
+                            {{it}}
+                        </a>
                     </li>
 
                 </ul>
                 <div id="sortable" class="sjs-default">
-                    <div data-sjsel="flatty" v-for="it in items">
+                    <div :data-sjsel="it.type" v-for="it in items">
                         <div class="card">
                             <img class="card__picture" :src="it.image">
                             <div class="card-infos">
@@ -143,6 +146,7 @@
             el : '#app',
             data : {
                 items:[],
+				types:[],
                 info:{
                     name:'',
                     image:'',
@@ -175,6 +179,9 @@
                     data = {}
                     apiAjax('infos','get',data,function (ret) {
                         this.items = ret
+						for(var i of ret){
+							this.types.push(i.type)
+						}
                         this.$nextTick(function () {
                             document.querySelector('#sortable').sortablejs()
                         });
