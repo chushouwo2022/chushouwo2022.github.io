@@ -177,7 +177,7 @@
 				layer.prompt(function(val, index){
 					var Datenow = new Date();					
 				  if(val==md5(Datenow.toLocaleDateString())){
-					this.getList();
+					app.getList();
 					layer.close(index);
 				  }
 				  
