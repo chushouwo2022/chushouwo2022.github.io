@@ -35,11 +35,14 @@
                     <li>
                         <a data-sjslink="all" class="nav__link">
                             全部
-                        </a>
-						<a :data-sjslink="it" class="nav__link" v-for="it in types">
-                            {{it}}
-                        </a>
+                        </a>						
                     </li>
+					 <li v-for="it in types">
+                        <a :data-sjslink="it" class="nav__link" >
+                            {{it}}
+                        </a>					
+                    </li>
+					
 
                 </ul>
                 <div id="sortable" class="sjs-default">
