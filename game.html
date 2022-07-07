@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="css/layui.css">
+    <link rel="stylesheet" href="css/cropper.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .avatar_modal{
+            padding: 20px;
+        }
+        .avatar-wrapper {
+            height: 364px;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: inset 0 0 5px rgb(0 0 0 / 25%);
+            background-color: #fcfcfc;
+            overflow: hidden;
+        }
+     </style>
+</head>
+<body>
+<div class="htmleaf-container" id="app">
+    <header class="htmleaf-header">
+        <h1>窝</h1>
+        <div style="color: #FFFFFF;margin: 10px auto;border: 1px solid #FFFFFF;border-radius: 6px;width: 80px;text-align: center" @click="add()">上传作品</div>
+    </header>
+    <main class="sortable">
+        <div class="container">
+            <div class="wrapper">
+                <ul class="sortable__nav nav">
+                    <li>
+                        <a data-sjslink="all" class="nav__link">
+                            全部
+                        </a>
+                    </li>
+
+                </ul>
+                <div id="sortable" class="sjs-default">
+                    <div data-sjsel="flatty" v-for="it in items">
+                        <div class="card">
+                            <img class="card__picture" :src="it.image">
+                            <div class="card-infos">
+                                <h2 class="card__title">{{it.name}}</h2>
+                                <p class="card__text">
+                                    {{it.name}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <div class="layui-form layui-form-pane upload_modal" style="display: none"  id="upload" >
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <input type="text" v-model="info.name"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">封面图</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" name="photo" @click="show_image_modal()">选择图片</button>
+            </div>
+            <div class="layui-upload-list">
+                <img class="layui-upload-img" id="photoimg" :src="info.image">
+                <p id="photoText"></p>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <input type="text" v-model="info.type"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">作者</label>
+            <div class="layui-input-block">
+                <input type="text" v-model="info.user"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">网盘地址</label>
+            <div class="layui-input-block">
+                <input type="text" v-model="info.url" class="layui-input">
+            </div>
+        </div>
+
+
+
+
+
+        <div class="layui-form-item">
+            <button class="layui-btn" type="button" @click="infoAdd()">提交</button>
+        </div>
+    </div>
+</div>
+
+<!-- 裁剪框 -->
+<div class="avatar_modal layui-hide">
+    <div class="avatar-body">
+        <div class="avatar-upload"><input name="avatar_src" type="hidden" class="avatar-src">
+            <input name="avatar_data" type="hidden" class="avatar-data">
+            <label>本地上传</label>
+            <input id="imgfile" name="avatar_file" type="file" class="avatar-input"></div>
+        <div class="row">
+            <div class="layui-col-lg12">
+                <div class="avatar-wrapper">
+                    <img id="image">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript" src="js/sortable.js"></script>
+<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/cropper.js"></script>
+<script type="text/javascript" src="js/jquery-cropper.js"></script>
+<script type="text/javascript" src="js/layer.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    initVue()
+
+    var app
+    var $image
+    function initVue() {
+        app = new Vue({
+            el : '#app',
+            data : {
+                items:[],
+                info:{
+                    name:'',
+                    image:'',
+                    url:'',
+                    content:'',
+                    type:'',
+                    user:''
+                }
+
+            },
+            watch : {
+
+            },
+            filters: {
+
+            },
+            computed:{
+
+            },
+            created : function() {
+                this.getList();
+            },
+            methods : {
+                getList: function(){
+                    var data = {
+                        folder:this.folder,
+                        limit:this.limit,
+                        page:this.page
+                    }
+                    data = {}
+                    apiAjax('infos','get',data,function (ret) {
+                        this.items = ret
+                        this.$nextTick(function () {
+                            document.querySelector('#sortable').sortablejs()
+                        });
+
+                    }.bind(this))
+                },
+                openFile:function (_it){
+
+                },
+                add:function () {
+                    layer.open({
+                        type: 1,
+                        title: '上传作品',
+                        area: ['100%', '100%'], //宽高
+                        content: $('.upload_modal')
+                    });
+                },
+                infoAdd:function () {
+                    if(this.info.name==''){
+                        layer.msg('请填写名称')
+                        return
+                    }
+                    if(this.info.image==''){
+                        layer.msg('请上传封面图')
+                        return
+                    }
+                    if(this.info.type==''){
+                        layer.msg('请填写类型')
+                        return
+                    }
+                    if(this.info.user==''){
+                        layer.msg('请填写作者')
+                        return
+                    }
+                    if(this.info.url==''){
+                        layer.msg('请填写网盘地址')
+                        return
+                    }
+                    apiAjax('infos','post',this.info,function (ret) {
+                        layer.msg('上传成功')
+                        setTimeout(function (){
+                            location.reload()
+                        },3000)
+                    }.bind(this))
+                },
+                show_image_modal:function () {
+                    layer.open({
+                        type: 1,
+                        title: '上传图片',
+                        area: ['90%','80%'],
+                        content: $('.avatar_modal'),
+                        btn: ['确定']
+                        ,yes: function(index, layero){
+                            layer.close(index);
+                            app.info.image = $image.cropper('getCroppedCanvas', {
+                                width: 200
+                            }).toDataURL('image/png');
+                            // image = $image.cropper('getCroppedCanvas', {
+                            //     width: Infotype=='视频'?480:200
+                            // }).toDataURL('image/png');
+                            console.log(image)
+                            //$('#photoimg').attr('src', image);
+                        }
+
+                    });
+
+                    $image = $('#image');
+                    //var aspectRatio = Infotype=='视频'?16/9:1;
+                    var options = {
+                        // aspectRatio: 16/9,
+                        viewMode:2
+                    };
+                    $image.cropper(options);
+
+                    // Import image
+                    var $inputImage = $('#imgfile');
+
+                    if (URL) {
+                        $inputImage.change(function () {
+                            var files = this.files;
+                            var file;
+
+                            if (!$image.data('cropper')) {
+                                return;
+                            }
+
+                            if (files && files.length) {
+                                file = files[0];
+
+                                if (/^image\/\w+$/.test(file.type)) {
+                                    uploadedImageName = file.name;
+                                    uploadedImageType = file.type;
+                                    uploadedImageURL = URL.createObjectURL(file);
+                                    $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+                                    $inputImage.val('');
+                                } else {
+                                    window.alert('Please choose an image file.');
+                                }
+                            }
+                        });
+                    } else {
+                        $inputImage.prop('disabled', true).parent().addClass('disabled');
+                    }
+
+                    $(".avatar_modal").removeClass('layui-hide');
+                }
+            }
+        })
+    }
+
+
+    function apiAjax(url,method,params,callback){
+        $.ajax({
+            url: 'https://a6101793990226-dev.apicloud-saas.com/api/' + url,
+            type: method,
+            ContentType: "application/json",
+            dataType:  "json",
+            async: false,
+            cache: false,
+            timeout: 20,
+            data: params,
+            success: function(ret) {
+                callback(ret);
+            },
+            error: function(err) {
+                console.log(err)
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>
