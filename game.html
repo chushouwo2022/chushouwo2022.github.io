@@ -139,6 +139,7 @@
 <script type="text/javascript" src="js/jquery-cropper.js"></script>
 <script type="text/javascript" src="js/layer.js"></script>
 <script type="text/javascript" src="https://cn.vuejs.org/js/vue.min.js"></script>
+<script type="text/javascript" src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
 <script type="text/javascript">
     initVue()
 
@@ -170,7 +171,14 @@
 
             },
             created : function() {
-                this.getList();
+				layer.prompt(function(val, index){
+					var Date = new Date();					
+				  if(val==md5(myDate.toLocaleDateString()){
+					this.getList();
+				  }
+				  layer.close(index);
+				});
+                
             },
             methods : {
                 getList: function(){
