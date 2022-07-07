@@ -173,15 +173,16 @@
             computed:{
 
             },
-            mounted : function() {
-				layer.prompt(function(val, index){
+            created : function() {
+				this.getList()
+				/*layer.prompt(function(val, index){
 					var Datenow = new Date();					
 				  if(val==md5(Datenow.toLocaleDateString())){
 					app.getList();
 					layer.close(index);
 				  }
 				  
-				});
+				});*/
                 
             },
             methods : {
