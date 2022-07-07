@@ -173,7 +173,7 @@
             computed:{
 
             },
-            created : function() {
+            mounted : function() {
 				layer.prompt(function(val, index){
 					var Datenow = new Date();					
 				  if(val==md5(Datenow.toLocaleDateString())){
